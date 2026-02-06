@@ -53,3 +53,9 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# build directory for executables
+build/
+
+# generated data
+data/measurements*
