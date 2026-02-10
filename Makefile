@@ -1,24 +1,27 @@
-CFLAGS=-Wall -Werror
-LDFLAGS=
+CC      := gcc
+CFLAGS  := -Wall -Wextra -std=c23 -Iinclude -lcmocka
 
-BIN=1b_challenge
+SRC_DIR := src
+OBJ_DIR := build
+BIN_DIR := bin
 
-all: $(BIN)
+SRCS := $(wildcard $(SRC_DIR)/*.c)
+OBJS := $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
+TARGET := $(BIN_DIR)/test_1b_challenge
 
-1b_challenge: src/1b_challenge.c src/1b_challenge_main.c src/1b_challenge.h
-	mkdir -p build
-	$(CC) -o build/1b_challenge src/1b_challenge.c src/1b_challenge_main.c $(CFLAGS) $(LDFLAGS)
+.PHONY: all clean
 
-data: scripts/generate_data.py
-	python scripts/generate_data.py
+all: $(TARGET)
 
-test: test_1b_challenge
-	build/test_1b_challenge
+$(TARGET): $(OBJS) | $(BIN_DIR)
+	$(CC) $(OBJS) -o $@ $(LDFLAGS)
 
-test_1b_challenge: src/test_1b_challenge.c src/1b_challenge.c src/1b_challenge.h
-	mkdir -p build
-	$(CC) -o build/test_1b_challenge src/test_1b_challenge.c src/1b_challenge.c -lcmocka $(CFLAGS) $(LDFLAGS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR) $(BIN_DIR):
+	mkdir -p $@
 
 clean:
-	rm -r build
+	rm -rf $(OBJ_DIR) $(BIN_DIR)
