@@ -40,8 +40,7 @@ size_t process_stream(struct oneb_data *oneb_data, FILE *input_stream) {
     return measurements;
 }
 
-void print_city(struct oneb_data *oneb_data, FILE *output_stream,
-                struct city *city) {
+void print_city(FILE *output_stream, struct city *city) {
     fprintf(output_stream,
             "{\"city\":\"%s\",\"min\":%.1f,\"max\":%.1f,\"mean\":%.1f,"
             "\"total\":%.1f,\"count\":%d}",
@@ -53,10 +52,10 @@ void print_cities(struct oneb_data *oneb_data, FILE *output_stream) {
     size_t i;
     fputs("[", output_stream);
     for (i = 0; i < oneb_data->nb_cities - 1; i++) {
-        print_city(oneb_data, output_stream, &oneb_data->cities[i]);
+        print_city(output_stream, &oneb_data->cities[i]);
         fputs(",", output_stream);
     }
-    print_city(oneb_data, output_stream, &oneb_data->cities[i]);
+    print_city(output_stream, &oneb_data->cities[i]);
     fputs("]", output_stream);
 }
 

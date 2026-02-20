@@ -22,8 +22,7 @@ struct oneb_data {
 size_t process_stream(struct oneb_data *oneb_data, FILE *input_stream);
 
 /* print a city in json format */
-void print_city(struct oneb_data *oneb_data, FILE *output_stream,
-                struct city *city);
+void print_city(FILE *output_stream, struct city *city);
 
 /* write the list of cities and their data (in JSON) to output_file*/
 void print_cities(struct oneb_data *oneb_data, FILE *output_stream);

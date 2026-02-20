@@ -4,19 +4,12 @@ import numpy as np
 import pandas as pd
 
 input_file = "data/cities.csv"
-output_file = "data/measurements.csv"
-nb_measurements = 10000
-
-if len(sys.argv) > 1:
-    nb_measurements = int(sys.argv[1])
+nb_measurements = int(sys.argv[1]) if len(sys.argv) > 1 else 10000
+output_file = sys.argv[2] if len(sys.argv) > 2 else sys.stdout
 
 cities = pd.read_csv(input_file, sep=";")
-nb_selected_cities = len(cities)
-if len(sys.argv) > 2:
-    nb_selected_cities = int(sys.argv[2])
-    cities = cities.sample(nb_selected_cities)
 
-print("Generating " + str(nb_measurements) + " data points in " + output_file)
+print("Generating " + str(nb_measurements) + " data points in " + str(output_file))
 
 measurements = cities.sample(nb_measurements, replace=True)
 print("  Picking random cities: OK")
