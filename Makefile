@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude
-LDLIBS = -lcmocka -lm
+LDLIBS = -lm
 
 .PHONY: all clean
 

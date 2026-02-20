@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
     FILE *output_stream;
 
     if (argc == 1) {
+        fprintf(stderr, "Warning: No input_file provided, default to stdin\n");
         input_stream = stdin;
         output_stream = stdout;
     } else if (argc == 2) {
