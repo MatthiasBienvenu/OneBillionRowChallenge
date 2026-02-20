@@ -1,26 +1,22 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c23 -Iinclude
+CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude
 LDLIBS = -lcmocka -lm
 
-TARGET = bin/test_1b_challenge
+.PHONY: all clean
 
-OBJS = build/1b_challenge.o build/1b_challenge_main.o
+all: bin/naive_main
 
-.PHONY: all clean run
-
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
+bin/naive_main: build/naive.o build/naive_main.o
 	mkdir -p bin
-	$(CC) $(OBJS) $(LDLIBS) -o $(TARGET)
+	$(CC) $^ $(LDLIBS) -o $@
 
-build/1b_challenge.o: src/1b_challenge.c include/1b_challenge.h
+build/naive.o: src/naive.c include/naive.h
 	mkdir -p build
-	$(CC) $(CFLAGS) -c src/1b_challenge.c -o build/1b_challenge.o
+	$(CC) $(CFLAGS) -c src/naive.c -o $@
 
-build/1b_challenge_main.o: src/1b_challenge_main.c include/1b_challenge.h
+build/naive_main.o: src/naive_main.c
 	mkdir -p build
-	$(CC) $(CFLAGS) -c src/1b_challenge_main.c -o build/1b_challenge_main.o
+	$(CC) $(CFLAGS) -c src/naive_main.c -o $@
 
 clean:
 	rm -rf build bin

@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "1b_challenge.h"
+#include "naive.h"
 
 #define MAX_LINE_LENGTH 32
 
@@ -61,7 +61,7 @@ void print_cities(struct oneb_data *oneb_data, FILE *output_stream) {
 
 void oneb_challenge_init(struct oneb_data *oneb_data) {
     oneb_data->nb_cities = 0;
-    oneb_data->cities = malloc(0);
+    oneb_data->cities = NULL;
 }
 
 struct city *oneb_challenge_add_city(struct oneb_data *oneb_data,
@@ -82,7 +82,6 @@ struct city *oneb_challenge_add_city(struct oneb_data *oneb_data,
 struct city *oneb_challenge_update_city(struct oneb_data *oneb_data,
                                         const char *city_name,
                                         float temperature) {
-
     size_t city_index = SIZE_MAX;
     for (size_t i = 0; i < oneb_data->nb_cities; i++) {
         if (strcmp(oneb_data->cities[i].name, city_name) == 0) {

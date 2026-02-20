@@ -1,13 +1,9 @@
 #include <assert.h>
-#include <setjmp.h>
+#include <cmocka.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-#include <cmocka.h>
-
-#include "1b_challenge.h"
+#include "naive.h"
 
 void test_oneb_init(void **state) {
     /* Test whether oneb_challenge_init works as intended  */

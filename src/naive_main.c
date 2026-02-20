@@ -8,7 +8,7 @@
 // #include <string.h>
 #include <time.h>
 
-#include "1b_challenge.h"
+#include "naive.h"
 
 int main(int argc, char **argv) {
     FILE *input_stream;
