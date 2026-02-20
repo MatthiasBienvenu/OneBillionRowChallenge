@@ -1,27 +1,26 @@
-CC      := gcc
-CFLAGS  := -Wall -Wextra -std=c23 -Iinclude -lcmocka
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c23 -Iinclude
+LDLIBS = -lcmocka -lm
 
-SRC_DIR := src
-OBJ_DIR := build
-BIN_DIR := bin
+TARGET = bin/test_1b_challenge
 
-SRCS := $(wildcard $(SRC_DIR)/*.c)
-OBJS := $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+OBJS = build/1b_challenge.o build/1b_challenge_main.o
 
-TARGET := $(BIN_DIR)/test_1b_challenge
-
-.PHONY: all clean
+.PHONY: all clean run
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS) | $(BIN_DIR)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+$(TARGET): $(OBJS)
+	mkdir -p bin
+	$(CC) $(OBJS) $(LDLIBS) -o $(TARGET)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+build/1b_challenge.o: src/1b_challenge.c include/1b_challenge.h
+	mkdir -p build
+	$(CC) $(CFLAGS) -c src/1b_challenge.c -o build/1b_challenge.o
 
-$(OBJ_DIR) $(BIN_DIR):
-	mkdir -p $@
+build/1b_challenge_main.o: src/1b_challenge_main.c include/1b_challenge.h
+	mkdir -p build
+	$(CC) $(CFLAGS) -c src/1b_challenge_main.c -o build/1b_challenge_main.o
 
 clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
+	rm -rf build bin
