@@ -62,32 +62,28 @@ void print_cities(city_vec *vec, FILE *output_stream) {
     fputs("]", output_stream);
 }
 
-city *oneb_challenge_update_city(city_vec *oneb_data, const char *city_name,
-                                 float temperature) {
-    size_t city_index = SIZE_MAX;
+int oneb_challenge_update_city(city_vec *oneb_data, const char *city_name,
+                               float temperature) {
     for (size_t i = 0; i < oneb_data->len; i++) {
-        if (strcmp(oneb_data->data[i].name, city_name) == 0) {
-            city_index = i;
+        city *city = &oneb_data->data[i];
+
+        if (strcmp(city->name, city_name) == 0) {
+            city->min_temp = fminf(city->min_temp, temperature);
+            city->max_temp = fmaxf(city->max_temp, temperature);
+            city->total_temp += temperature;
+            city->count++;
+            city->mean_temp = city->total_temp / city->count;
+
+            return 0;
         }
     }
 
-    if (city_index == SIZE_MAX) {
-        // add a new city
-        city city = {.min_temp = temperature,
-                     .max_temp = temperature,
-                     .total_temp = temperature,
-                     .mean_temp = temperature,
-                     .count = 1};
-        strcpy(city.name, city_name);
-        city_vec_push(oneb_data, &city);
-    } else {
-        city *city = &oneb_data->data[city_index];
-        city->min_temp = fminf(city->min_temp, temperature);
-        city->max_temp = fmaxf(city->max_temp, temperature);
-        city->total_temp += temperature;
-        city->count++;
-        city->mean_temp = city->total_temp / city->count;
-    }
-
-    return NULL;
+    // add a new city
+    city city = {.min_temp = temperature,
+                 .max_temp = temperature,
+                 .total_temp = temperature,
+                 .mean_temp = temperature,
+                 .count = 1};
+    strcpy(city.name, city_name);
+    return city_vec_push(oneb_data, &city);
 }

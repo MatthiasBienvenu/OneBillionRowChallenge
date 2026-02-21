@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude -g
+CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude -O3
 LDLIBS = -lm
 TESTLDLIBS = -lmocka
 
