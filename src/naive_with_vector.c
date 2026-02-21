@@ -8,25 +8,13 @@
 #include <time.h>
 
 #include "naive_with_vector.h"
+#include "vector_generic.h"
 
 #define MAX_LINE_LENGTH 32
 
-void push(struct oneb_data *vector, const char *city_name, float temperature) {
-    size_t len = ++vector->len;
+IMPLEMENT_VEC(city);
 
-    if (vector->capacity < len) {
-        vector->cities = realloc(vector->cities, vector->capacity *= 2);
-    }
-
-    struct city *city = &vector->cities[len];
-
-    strcpy(city->name, city_name);
-    city->count = 1;
-    city->min_temp = city->max_temp = city->total_temp = city->mean_temp =
-        temperature;
-}
-
-size_t process_stream(struct oneb_data *oneb_data, FILE *input_stream) {
+size_t process_stream(city_vec *vec, FILE *input_stream) {
     size_t measurements = 0;
     char buffer[MAX_LINE_LENGTH];
     char *endptr;
@@ -49,13 +37,13 @@ size_t process_stream(struct oneb_data *oneb_data, FILE *input_stream) {
             return 0;
         }
 
-        oneb_challenge_update_city(oneb_data, buffer, temperature);
+        oneb_challenge_update_city(vec, buffer, temperature);
     }
 
     return measurements;
 }
 
-void print_city(FILE *output_stream, struct city *city) {
+void print_city(FILE *output_stream, city *city) {
     fprintf(output_stream,
             "{\"city\":\"%s\",\"min\":%.1f,\"max\":%.1f,\"mean\":%.1f,"
             "\"total\":%.1f,\"count\":%d}",
@@ -63,50 +51,37 @@ void print_city(FILE *output_stream, struct city *city) {
             city->total_temp, city->count);
 }
 
-void print_cities(struct oneb_data *oneb_data, FILE *output_stream) {
+void print_cities(city_vec *vec, FILE *output_stream) {
     size_t i;
     fputs("[", output_stream);
-    for (i = 0; i < oneb_data->len - 1; i++) {
-        print_city(output_stream, &oneb_data->cities[i]);
+    for (i = 0; i < vec->len - 1; i++) {
+        print_city(output_stream, &vec->data[i]);
         fputs(",", output_stream);
     }
-    print_city(output_stream, &oneb_data->cities[i]);
+    print_city(output_stream, &vec->data[i]);
     fputs("]", output_stream);
 }
 
-void oneb_challenge_init(struct oneb_data *oneb_data) {
-    oneb_data->len = 0;
-    oneb_data->cities = NULL;
-}
-
-struct city *oneb_challenge_add_city(struct oneb_data *oneb_data,
-                                     const char *city_name, float temperature) {
-    int index = oneb_data->len++;
-    push(&oneb_data);
-
-    struct city *city = &oneb_data->cities[index];
-    strcpy(city->name, city_name);
-    city->count = 1;
-    city->min_temp = city->max_temp = city->total_temp = city->mean_temp =
-        temperature;
-
-    return &oneb_data->cities[index];
-}
-
-struct city *oneb_challenge_update_city(struct oneb_data *oneb_data,
-                                        const char *city_name,
-                                        float temperature) {
+city *oneb_challenge_update_city(city_vec *oneb_data, const char *city_name,
+                                 float temperature) {
     size_t city_index = SIZE_MAX;
     for (size_t i = 0; i < oneb_data->len; i++) {
-        if (strcmp(oneb_data->cities[i].name, city_name) == 0) {
+        if (strcmp(oneb_data->data[i].name, city_name) == 0) {
             city_index = i;
         }
     }
 
     if (city_index == SIZE_MAX) {
-        oneb_challenge_add_city(oneb_data, city_name, temperature);
+        // add a new city
+        city city = {.min_temp = temperature,
+                     .max_temp = temperature,
+                     .total_temp = temperature,
+                     .mean_temp = temperature,
+                     .count = 1};
+        strcpy(city.name, city_name);
+        city_vec_push(oneb_data, &city);
     } else {
-        struct city *city = &oneb_data->cities[city_index];
+        city *city = &oneb_data->data[city_index];
         city->min_temp = fminf(city->min_temp, temperature);
         city->max_temp = fmaxf(city->max_temp, temperature);
         city->total_temp += temperature;

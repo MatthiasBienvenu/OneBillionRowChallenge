@@ -1,51 +1,35 @@
 #ifndef ONEB_CHALLENGE_H
 #define ONEB_CHALLENGE_H
 
+#include "vector_generic.h"
 #include <stdio.h>
 #define CITY_NAME_MAX_LEN 32
 
-struct city {
+typedef struct {
     char name[CITY_NAME_MAX_LEN];
     float min_temp;
     float max_temp;
     float total_temp;
     float mean_temp;
     int count;
-};
+} city;
 
-struct oneb_data {
-    struct city *cities;
-    size_t len;
-    size_t capacity;
-};
+DECLARE_VEC(city);
 
-/* pushes the given value to the vector */
-void push(struct oneb_data *vector, const char *city_name, float temperature);
-
-/* process the file and store the result in oneb_data */
-size_t process_stream(struct oneb_data *oneb_data, FILE *input_stream);
+/* process the file and store the result in vec */
+size_t process_stream(city_vec *vec, FILE *input_stream);
 
 /* print a city in json format */
-void print_city(FILE *output_stream, struct city *city);
+void print_city(FILE *output_stream, city *city);
 
 /* write the list of cities and their data (in JSON) to output_file*/
-void print_cities(struct oneb_data *oneb_data, FILE *output_stream);
-
-/* initialize a oneb_data structure */
-void oneb_challenge_init(struct oneb_data *oneb_data);
-
-/* Add a new city to a onb_data structure.
- * Return a pointer to the newly created city
- */
-struct city *oneb_challenge_add_city(struct oneb_data *oneb_data,
-                                     const char *city_name, float temperature);
+void print_cities(city_vec *vec, FILE *output_stream);
 
 /* Search for a city and update its temperature statistics
  * If the city is unknown, it is created
- * This function returns the struct city that was created/updated
+ * This function returns the city that was created/updated
  */
-struct city *oneb_challenge_update_city(struct oneb_data *oneb_data,
-                                        const char *city_name,
-                                        float temperature);
+city *oneb_challenge_update_city(city_vec *vec, const char *city_name,
+                                 float temperature);
 
 #endif /* ONEB_CHALLENGE_H */
