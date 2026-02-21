@@ -16,7 +16,7 @@ int vec_init(struct vec *v, size_t element_size) {
 int vec_push(struct vec *v, void *value) {
     if (v->capacity < ++v->len) {
         v->capacity *= 2;
-        v->data = realloc(v->data, v->capacity);
+        v->data = realloc(v->data, v->capacity * v->element_size);
 
         if (v->data == NULL) {
             return 1;
