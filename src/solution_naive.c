@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "naive.h"
+#include "solution_naive.h"
 
 #define MAX_LINE_LENGTH 32
 

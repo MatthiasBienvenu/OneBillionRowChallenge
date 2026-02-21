@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "naive_with_vector.h"
+#include "solution_vector.h"
 #include "vector_generic.h"
 
 #define MAX_LINE_LENGTH 32

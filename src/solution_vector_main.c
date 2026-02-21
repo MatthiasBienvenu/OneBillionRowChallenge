@@ -8,7 +8,7 @@
 // #include <string.h>
 #include <time.h>
 
-#include "naive.h"
+#include "solution_vector.h"
 
 int main(int argc, char **argv) {
     FILE *input_stream;
@@ -41,8 +41,8 @@ int main(int argc, char **argv) {
     struct timespec t1, t2;
     clock_gettime(CLOCK_MONOTONIC, &t1);
 
-    struct oneb_data oneb_data;
-    oneb_challenge_init(&oneb_data);
+    city_vec oneb_data;
+    city_vec_init(&oneb_data);
 
     size_t nb_measurements = process_stream(&oneb_data, input_stream);
 

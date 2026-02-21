@@ -2,6 +2,7 @@
 #define ONEB_CHALLENGE_H
 
 #include <stdio.h>
+
 #define CITY_NAME_MAX_LEN 32
 
 struct city {

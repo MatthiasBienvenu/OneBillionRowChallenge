@@ -3,6 +3,7 @@
 
 #include "vector_generic.h"
 #include <stdio.h>
+
 #define CITY_NAME_MAX_LEN 32
 
 typedef struct {

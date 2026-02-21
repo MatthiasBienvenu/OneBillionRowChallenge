@@ -5,43 +5,43 @@ TESTLDLIBS = -lmocka
 
 .PHONY: all clean run test
 
-all: bin/naive_main bin/naive_with_vector_main bin/solution_hashmap_main
+all: bin/solution_naive_main bin/solution_vector_main bin/solution_hashmap_main
 
 clean:
 	rm -rf build bin
 
 run: all
-	bin/naive_with_vector_main data/measurements_1m.csv >/dev/null
+	bin/solution_vector_main data/measurements_1m.csv >/dev/null
 
 test: bin/test_vector
 	bin/test_vector
 
 # Naive approach
-bin/naive_main: build/naive.o build/naive_main.o
+bin/solution_naive_main: build/solution_naive.o build/solution_naive_main.o
 	mkdir -p bin
 	$(CC) $(CFLAGS) $(LDLIBS) $^ -o $@
 
-build/naive.o: src/naive.c include/naive.h
+build/solution_naive.o: src/solution_naive.c include/solution_naive.h
 	mkdir -p build
-	$(CC) $(CFLAGS) $(LDLIBS) -c src/naive.c -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) -c src/solution_naive.c -o $@
 
-build/naive_main.o: src/naive_main.c
+build/solution_naive_main.o: src/solution_naive_main.c
 	mkdir -p build
-	$(CC) $(CFLAGS) $(LDLIBS) -c src/naive_main.c -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) -c src/solution_naive_main.c -o $@
 
 
 # Naive approach with a vector
-bin/naive_with_vector_main: build/naive_with_vector.o build/naive_with_vector_main.o
+bin/solution_vector_main: build/solution_vector.o build/solution_vector_main.o
 	mkdir -p bin
 	$(CC) $(CFLAGS) $(LDLIBS) $^ -o $@
 
-build/naive_with_vector.o: src/naive_with_vector.c include/naive_with_vector.h
+build/solution_vector.o: src/solution_vector.c include/solution_vector.h
 	mkdir -p build
-	$(CC) $(CFLAGS) $(LDLIBS) -c src/naive.c -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) -c src/solution_naive.c -o $@
 
-build/naive_with_vector_main.o: src/naive_with_vector_main.c
+build/solution_vector_main.o: src/solution_vector_main.c
 	mkdir -p build
-	$(CC) $(CFLAGS) $(LDLIBS) -c src/naive_main.c -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) -c src/solution_naive_main.c -o $@
 
 
 # Approach with a hashmap
