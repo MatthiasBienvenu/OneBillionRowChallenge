@@ -37,11 +37,11 @@ bin/solution_vector_main: build/solution_vector.o build/solution_vector_main.o
 
 build/solution_vector.o: src/solution_vector.c include/solution_vector.h
 	mkdir -p build
-	$(CC) $(CFLAGS) $(LDLIBS) -c src/solution_naive.c -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) -c src/solution_vector.c -o $@
 
 build/solution_vector_main.o: src/solution_vector_main.c
 	mkdir -p build
-	$(CC) $(CFLAGS) $(LDLIBS) -c src/solution_naive_main.c -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) -c src/solution_vector_main.c -o $@
 
 
 # Approach with a hashmap

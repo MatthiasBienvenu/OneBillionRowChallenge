@@ -30,7 +30,7 @@ void print_cities(city_vec *vec, FILE *output_stream);
  * If the city is unknown, it is created
  * This function returns the city that was created/updated
  */
-int oneb_challenge_update_city(city_vec *vec, const char *city_name,
-                               float temperature);
+int vector_update(city_vec *vec, const char city_name[CITY_NAME_MAX_LEN],
+                  float temperature);
 
 #endif /* ONEB_CHALLENGE_H */

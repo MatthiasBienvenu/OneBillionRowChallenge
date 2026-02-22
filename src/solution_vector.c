@@ -37,7 +37,7 @@ size_t process_stream(city_vec *vec, FILE *input_stream) {
             return 0;
         }
 
-        oneb_challenge_update_city(vec, buffer, temperature);
+        vector_update(vec, buffer, temperature);
     }
 
     return measurements;
@@ -62,10 +62,10 @@ void print_cities(city_vec *vec, FILE *output_stream) {
     fputs("]", output_stream);
 }
 
-int oneb_challenge_update_city(city_vec *oneb_data, const char *city_name,
-                               float temperature) {
-    for (size_t i = 0; i < oneb_data->len; i++) {
-        city *city = &oneb_data->data[i];
+int vector_update(city_vec *vec, const char city_name[CITY_NAME_MAX_LEN],
+                  float temperature) {
+    for (size_t i = 0; i < vec->len; i++) {
+        city *city = &vec->data[i];
 
         if (strcmp(city->name, city_name) == 0) {
             city->min_temp = fminf(city->min_temp, temperature);
@@ -85,5 +85,5 @@ int oneb_challenge_update_city(city_vec *oneb_data, const char *city_name,
                  .mean_temp = temperature,
                  .count = 1};
     strcpy(city.name, city_name);
-    return city_vec_push(oneb_data, &city);
+    return city_vec_push(vec, &city);
 }
