@@ -22,6 +22,7 @@ int hashmap_init(hashmap *map) {
         return 1;
     }
     map->len = 1;
+    map->count = 0;
 
     city_vec_init(map->buckets);
 
