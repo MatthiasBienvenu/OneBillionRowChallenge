@@ -68,3 +68,6 @@ data/
 
 # clangd stuff
 .cache
+
+# perf stuff
+perf.data*

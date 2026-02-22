@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude -O3
+CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude -O3 -g -fno-omit-frame-pointer
 LDLIBS = -lm
 TESTLDLIBS = -lmocka
 
@@ -11,7 +11,7 @@ clean:
 	rm -rf build bin
 
 run: all
-	bin/solution_vector_main data/measurements_1m.csv >/dev/null
+	bin/solution_hashmap_main data/measurements_10m.csv /dev/null
 
 test: bin/test_vector
 	bin/test_vector
@@ -19,7 +19,7 @@ test: bin/test_vector
 # Naive approach
 bin/solution_naive_main: build/solution_naive.o build/solution_naive_main.o
 	mkdir -p bin
-	$(CC) $(CFLAGS) $(LDLIBS) $^ -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) $^ -o $@ -flto
 
 build/solution_naive.o: src/solution_naive.c include/solution_naive.h
 	mkdir -p build
@@ -33,7 +33,7 @@ build/solution_naive_main.o: src/solution_naive_main.c
 # Naive approach with a vector
 bin/solution_vector_main: build/solution_vector.o build/solution_vector_main.o
 	mkdir -p bin
-	$(CC) $(CFLAGS) $(LDLIBS) $^ -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) $^ -o $@ -flto
 
 build/solution_vector.o: src/solution_vector.c include/solution_vector.h
 	mkdir -p build
@@ -47,7 +47,7 @@ build/solution_vector_main.o: src/solution_vector_main.c
 # Approach with a hashmap
 bin/solution_hashmap_main: build/solution_hashmap.o build/solution_hashmap_main.o
 	mkdir -p bin
-	$(CC) $(CFLAGS) $(LDLIBS) $^ -o $@
+	$(CC) $(CFLAGS) $(LDLIBS) $^ -o $@ -flto
 
 build/solution_hashmap.o: src/solution_hashmap.c include/solution_hashmap.h
 	mkdir -p build
@@ -59,9 +59,9 @@ build/solution_hashmap_main.o: src/solution_hashmap_main.c
 
 
 # Vector lib
+bin/test_vector: tests/test_vector.c build/vector.o
+	$(CC) $(CFLAGS) $(LDLIBS) $(TESTLDLIBS) $^ -o $@ -flto
+
 build/vector.o: lib/vector.c include/vector.h
 	mkdir -p build
 	$(CC) $(CFLAGS) $(LDLIBS) -c lib/vector.c -o $@
-
-bin/test_vector: tests/test_vector.c build/vector.o
-	$(CC) $(CFLAGS) $(LDLIBS) $(TESTLDLIBS) $^ -o $@
