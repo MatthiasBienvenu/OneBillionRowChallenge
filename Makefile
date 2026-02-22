@@ -4,7 +4,7 @@ LINKFLAGS = -flto -static
 LDLIBS = -lm
 TESTLDLIBS = -lmocka
 
-.PHONY: all clean run test
+.PHONY: all clean run test perf
 
 all: bin/solution_naive_main bin/solution_vector_main bin/solution_hashmap_main
 
@@ -16,6 +16,10 @@ run: all
 
 test: bin/test_vector
 	bin/test_vector
+
+perf: bin/solution_hashmap_main
+	perf record --debuginfod --call-graph dwarf bin/solution_hashmap_main data/measurements_10m.csv /dev/null
+	perf report
 
 # Naive approach
 bin/solution_naive_main: build/solution_naive.o build/solution_naive_main.o
