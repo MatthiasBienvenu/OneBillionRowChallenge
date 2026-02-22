@@ -12,6 +12,8 @@
 
 #define MAX_LINE_LENGTH 32
 
+const float max_load_factor = 0.75;
+
 IMPLEMENT_VEC(city);
 
 int hashmap_init(hashmap *map) {
@@ -28,8 +30,8 @@ int hashmap_init(hashmap *map) {
 
 int hashmap_update(hashmap *map, const char key[CITY_NAME_MAX_LEN],
                    float temperature) {
-    size_t h = hash(key) % map->len;
-    city_vec *bucket = &map->buckets[h];
+    size_t h = hash(key);
+    city_vec *bucket = &map->buckets[h % map->len];
 
     for (size_t i = 0; i < bucket->len; i++) {
         city *city = &bucket->data[i];
@@ -46,14 +48,59 @@ int hashmap_update(hashmap *map, const char key[CITY_NAME_MAX_LEN],
         }
     }
 
-    // add a new city
-    city city = {.min_temp = temperature,
+    //  add a new city
+    city city = {.hash = h,
+                 .min_temp = temperature,
                  .max_temp = temperature,
                  .total_temp = temperature,
                  .mean_temp = temperature,
                  .count = 1};
     strcpy(city.name, key);
+
+    // maybe increase the hashmap
+    if (++map->count > map->len * max_load_factor) {
+        if (hashmap_double_size(map)) {
+            return 1;
+        }
+        bucket = &map->buckets[h % map->len];
+    }
+
     return city_vec_push(bucket, &city);
+}
+
+int hashmap_double_size(hashmap *map) {
+    fprintf(stderr, "doubling to %zu. count = %zu\n", map->len * 2, map->count);
+    city_vec *old_buckets = map->buckets;
+    const size_t new_len = map->len * 2;
+
+    map->buckets = malloc(new_len * sizeof(city_vec));
+    if (map->buckets == NULL) {
+        return 1;
+    }
+
+    for (size_t i = 0; i < new_len; i++) {
+        if (city_vec_init(&map->buckets[i])) {
+            return 1;
+        }
+    }
+
+    for (size_t i = 0; i < map->len; i++) {
+        const city_vec *old_bucket = &old_buckets[i];
+
+        for (size_t j = 0; j < old_bucket->len; j++) {
+            const city *city = &old_bucket->data[j];
+            city_vec *new_bucket = &map->buckets[city->hash % new_len];
+
+            if (city_vec_push(new_bucket, city)) {
+                return 1;
+            };
+        }
+    }
+
+    map->len = new_len;
+
+    free(old_buckets);
+    return 0;
 }
 
 size_t process_stream(hashmap *map, FILE *input_stream) {
@@ -85,7 +132,7 @@ size_t process_stream(hashmap *map, FILE *input_stream) {
     return measurements;
 }
 
-void print_city(FILE *output_stream, city *city) {
+void print_city(FILE *output_stream, const city *city) {
     fprintf(output_stream,
             "{\"city\":\"%s\",\"min\":%.1f,\"max\":%.1f,\"mean\":%.1f,"
             "\"total\":%.1f,\"count\":%d}",
@@ -119,8 +166,8 @@ void print_cities(hashmap *map, FILE *output_stream) {
 /* fnv1a_64 */
 size_t hash(const char key[MAX_LINE_LENGTH]) {
     size_t h = 1469598103934665603; // FNV offset basis
-    for (int i = 0; i < MAX_LINE_LENGTH; i++) {
-        h ^= (unsigned char)key[i];
+    for (const char *c = key; *c != '\0'; c++) {
+        h ^= (unsigned char)*c;
         h *= 1099511628211; // FNV prime
     }
     return h;

@@ -15,7 +15,7 @@
     int type##_vec##_init(type##_vec *v);                                      \
                                                                                \
     /* Push a value at the end of the vector. */                               \
-    int type##_vec##_push(type##_vec *v, type *value);                         \
+    int type##_vec##_push(type##_vec *v, const type *value);                   \
                                                                                \
     /* Remove the last element from the                                        \
      * vector and copy it to value.                                            \
@@ -27,7 +27,7 @@
     /* Create a vector from an array.                                          \
      * /!\ Performs a copy of the array.                                       \
      */                                                                        \
-    int type##_vec##_from_array(type##_vec *v, void *array, size_t len);
+    int type##_vec##_from_array(type##_vec *v, const void *array, size_t len);
 
 #define IMPLEMENT_VEC(type)                                                    \
     int type##_vec##_init(type##_vec *v) {                                     \
@@ -38,7 +38,7 @@
         return v->data == NULL;                                                \
     }                                                                          \
                                                                                \
-    int type##_vec##_push(type##_vec *v, type *value) {                        \
+    int type##_vec##_push(type##_vec *v, const type *value) {                  \
         if (v->capacity < ++v->len) {                                          \
             v->capacity *= 2;                                                  \
             v->data = realloc(v->data, v->capacity * sizeof(type));            \
@@ -64,7 +64,8 @@
         return 0;                                                              \
     }                                                                          \
                                                                                \
-    int type##_vec##_from_array(type##_vec *v, void *array, size_t len) {      \
+    int type##_vec##_from_array(type##_vec *v, const void *array,              \
+                                size_t len) {                                  \
         v->data = malloc(sizeof(type) * len);                                  \
         if (v->data == NULL) {                                                 \
             return 1;                                                          \
