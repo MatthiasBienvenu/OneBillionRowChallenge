@@ -100,7 +100,8 @@ void print_cities(hashmap *map, FILE *output_stream) {
     city *city = NULL;
 
     for (bucket = map->buckets; bucket < &map->buckets[map->len]; bucket++) {
-        for (city = bucket->data; city < &bucket->data[bucket->len]; city++) {
+        for (city = bucket->data; city < &bucket->data[bucket->len - 1];
+             city++) {
             print_city(output_stream, city);
             fputs(",", output_stream);
         }
