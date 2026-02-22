@@ -96,20 +96,21 @@ void print_city(FILE *output_stream, city *city) {
 void print_cities(hashmap *map, FILE *output_stream) {
     fputs("[", output_stream);
 
-    city_vec *bucket;
-    city *city = NULL;
+    int first = 1; // Track if this is the first city
 
-    for (bucket = map->buckets; bucket < &map->buckets[map->len]; bucket++) {
-        for (city = bucket->data; city < &bucket->data[bucket->len - 1];
-             city++) {
+    for (size_t b = 0; b < map->len; b++) {
+        city_vec *bucket = &map->buckets[b];
+
+        for (size_t i = 0; i < bucket->len; i++) {
+            city *city = &bucket->data[i];
+
+            if (!first) {
+                fputs(",", output_stream);
+            }
+            first = 0;
+
             print_city(output_stream, city);
-            fputs(",", output_stream);
         }
-    }
-
-    // don't put a comma for the last city
-    if (city != NULL) {
-        print_city(output_stream, city);
     }
 
     fputs("]", output_stream);
