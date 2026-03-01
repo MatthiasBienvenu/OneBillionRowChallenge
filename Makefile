@@ -18,7 +18,7 @@ test: bin/test_vector
 	bin/test_vector
 
 perf: bin/solution_hashmap_main
-	perf record --debuginfod --call-graph dwarf bin/solution_hashmap_main data/measurements_10m.csv /dev/null
+	perf record --debuginfod --call-graph dwarf make run
 	perf report
 
 # Naive approach

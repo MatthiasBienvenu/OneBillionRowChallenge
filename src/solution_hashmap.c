@@ -37,7 +37,7 @@ int hashmap_update(hashmap *map, const char key[CITY_NAME_MAX_LEN],
     for (size_t i = 0; i < bucket->len; i++) {
         city *city = &bucket->data[i];
 
-        if (strcmp(city->name, key) == 0) {
+        if (city->hash == h && strcmp(city->name, key) == 0) {
             // update the city
             city->min_temp = fminf(city->min_temp, temperature);
             city->max_temp = fmaxf(city->max_temp, temperature);
@@ -70,7 +70,6 @@ int hashmap_update(hashmap *map, const char key[CITY_NAME_MAX_LEN],
 }
 
 int hashmap_double_size(hashmap *map) {
-    fprintf(stderr, "doubling to %zu. count = %zu\n", map->len * 2, map->count);
     city_vec *old_buckets = map->buckets;
     const size_t new_len = map->len * 2;
 
