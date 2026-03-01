@@ -1,7 +1,6 @@
 #include "fast_strtof.h"
-#include <stdio.h>
 
-float fast_strtof(const char *string, const char **end) {
+float fast_strtof(const char *string, char **end) {
     float sign = 1.0f;
     float result = 0.0f;
     float base = 1.0f;
@@ -20,7 +19,7 @@ float fast_strtof(const char *string, const char **end) {
 
     // dot
     if (*string != '.') {
-        *end = string;
+        *end = (char *)string;
         return sign * result;
     }
     string++;
@@ -31,6 +30,6 @@ float fast_strtof(const char *string, const char **end) {
         result += (*string - '0') * base;
     }
 
-    *end = string;
+    *end = (char *)string;
     return sign * result;
 }

@@ -8,8 +8,8 @@
 
 static void test_simple_positive_float(void **state) {
     (void)state;
-    const char *input = "12.5";
-    const char *end = NULL;
+    char *input = "12.5";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -19,8 +19,8 @@ static void test_simple_positive_float(void **state) {
 
 static void test_simple_negative_float(void **state) {
     (void)state;
-    const char *input = "-3.4";
-    const char *end = NULL;
+    char *input = "-3.4";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -30,7 +30,7 @@ static void test_simple_negative_float(void **state) {
 
 static void test_zero_values(void **state) {
     (void)state;
-    const char *end = NULL;
+    char *end = NULL;
 
     float result = fast_strtof("0.0", &end);
     assert_float_equal(result, 0.0f, EPS);
@@ -41,8 +41,8 @@ static void test_zero_values(void **state) {
 
 static void test_small_decimal(void **state) {
     (void)state;
-    const char *input = "0.586";
-    const char *end = NULL;
+    char *input = "0.586";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -51,8 +51,8 @@ static void test_small_decimal(void **state) {
 
 static void test_large_number(void **state) {
     (void)state;
-    const char *input = "9999.999";
-    const char *end = NULL;
+    char *input = "9999.999";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -61,8 +61,8 @@ static void test_large_number(void **state) {
 
 static void test_multiple_decimal_places(void **state) {
     (void)state;
-    const char *input = "123.456789";
-    const char *end = NULL;
+    char *input = "123.456789";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -71,8 +71,8 @@ static void test_multiple_decimal_places(void **state) {
 
 static void test_end_pointer(void **state) {
     (void)state;
-    const char *input = "42.75abc";
-    const char *end = NULL;
+    char *input = "42.75abc";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -83,8 +83,8 @@ static void test_end_pointer(void **state) {
 
 static void test_no_decimal_point(void **state) {
     (void)state;
-    const char *input = "42";
-    const char *end = NULL;
+    char *input = "42";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -93,8 +93,8 @@ static void test_no_decimal_point(void **state) {
 
 static void test_decimal_only(void **state) {
     (void)state;
-    const char *input = ".3";
-    const char *end = NULL;
+    char *input = ".3";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -104,8 +104,8 @@ static void test_decimal_only(void **state) {
 
 static void test_no_fractional_part(void **state) {
     (void)state;
-    const char *input = "2.";
-    const char *end = NULL;
+    char *input = "2.";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -115,8 +115,8 @@ static void test_no_fractional_part(void **state) {
 
 static void test_no_decimal(void **state) {
     (void)state;
-    const char *input = "-10";
-    const char *end = NULL;
+    char *input = "-10";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -128,8 +128,8 @@ static void test_no_decimal(void **state) {
 
 static void test_empty_string(void **state) {
     (void)state;
-    const char *input = "";
-    const char *end = NULL;
+    char *input = "";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -139,8 +139,8 @@ static void test_empty_string(void **state) {
 
 static void test_nan(void **state) {
     (void)state;
-    const char *input = "nan";
-    const char *end = NULL;
+    char *input = "nan";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -150,8 +150,8 @@ static void test_nan(void **state) {
 
 static void test_infinity(void **state) {
     (void)state;
-    const char *input = "infinity";
-    const char *end = NULL;
+    char *input = "infinity";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 
@@ -161,8 +161,8 @@ static void test_infinity(void **state) {
 
 static void test_random_text(void **state) {
     (void)state;
-    const char *input = "abcdef";
-    const char *end = NULL;
+    char *input = "abcdef";
+    char *end = NULL;
 
     float result = fast_strtof(input, &end);
 

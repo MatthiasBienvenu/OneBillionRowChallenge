@@ -7,6 +7,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "fast_strtof.h"
 #include "solution_hashmap.h"
 #include "vector_generic.h"
 
@@ -120,7 +121,7 @@ size_t process_stream(hashmap *map, FILE *input_stream) {
         // end the string at the separator so that it can be directly passed
         // to oneb_challenge_update_city
         *endptr = '\0';
-        temperature = strtof(endptr + 1, &endptr);
+        temperature = fast_strtof(endptr + 1, &endptr);
         if (*(endptr - 1) == '\0') {
             // no valid float could be parsed
             return 0;

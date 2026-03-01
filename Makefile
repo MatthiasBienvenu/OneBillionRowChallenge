@@ -27,7 +27,7 @@ perf: bin/solution_hashmap_main
 
 # Naive approach
 bin/solution_naive_main: build/solution_naive.o build/solution_naive_main.o
-	mkdir -p build
+	mkdir -p bin
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(LINKFLAGS)
 
 build/solution_naive.o: src/solution_naive.c include/solution_naive.h
@@ -41,7 +41,7 @@ build/solution_naive_main.o: src/solution_naive_main.c
 
 # Naive approach with a vector
 bin/solution_vector_main: build/solution_vector.o build/solution_vector_main.o
-	mkdir -p build
+	mkdir -p bin
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(LINKFLAGS)
 
 build/solution_vector.o: src/solution_vector.c include/solution_vector.h include/solution_vector.h
@@ -54,8 +54,8 @@ build/solution_vector_main.o: src/solution_vector_main.c
 
 
 # Approach with a hashmap
-bin/solution_hashmap_main: build/solution_hashmap.o build/solution_hashmap_main.o
-	mkdir -p build
+bin/solution_hashmap_main: build/solution_hashmap.o build/solution_hashmap_main.o build/fast_strtof.o
+	mkdir -p bin
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(LINKFLAGS)
 
 build/solution_hashmap.o: src/solution_hashmap.c include/solution_hashmap.h include/solution_vector.h

@@ -4,4 +4,4 @@
  *
  * return the parsed float or 0.0f if no number could be parsed
  */
-float fast_strtof(const char *restrict string, const char **restrict end);
+float fast_strtof(const char *restrict string, char **restrict end);
