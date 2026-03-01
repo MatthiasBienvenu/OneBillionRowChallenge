@@ -23,8 +23,8 @@ typedef struct {
     int y;
 } Point;
 
-DECLARE_VEC(Point)
-IMPLEMENT_VEC(Point)
+DECLARE_VEC(Point);
+IMPLEMENT_VEC(Point);
 
 /* ========== POSITIVE TESTS ========== */
 

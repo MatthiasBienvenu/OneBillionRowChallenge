@@ -17,8 +17,9 @@ clean:
 run: all
 	bin/solution_hashmap_main data/measurements_10m.csv /dev/null
 
-test: bin/test_vector
+test: bin/test_vector bin/test_fast_strtof
 	bin/test_vector
+	bin/test_fast_strtof
 
 perf: bin/solution_hashmap_main
 	perf record --debuginfod --call-graph dwarf make run
@@ -26,7 +27,7 @@ perf: bin/solution_hashmap_main
 
 # Naive approach
 bin/solution_naive_main: build/solution_naive.o build/solution_naive_main.o
-	mkdir -p bin
+	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(LINKFLAGS)
 
 build/solution_naive.o: src/solution_naive.c include/solution_naive.h
@@ -40,7 +41,7 @@ build/solution_naive_main.o: src/solution_naive_main.c
 
 # Naive approach with a vector
 bin/solution_vector_main: build/solution_vector.o build/solution_vector_main.o
-	mkdir -p bin
+	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(LINKFLAGS)
 
 build/solution_vector.o: src/solution_vector.c include/solution_vector.h include/solution_vector.h
@@ -54,7 +55,7 @@ build/solution_vector_main.o: src/solution_vector_main.c
 
 # Approach with a hashmap
 bin/solution_hashmap_main: build/solution_hashmap.o build/solution_hashmap_main.o
-	mkdir -p bin
+	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(LINKFLAGS)
 
 build/solution_hashmap.o: src/solution_hashmap.c include/solution_hashmap.h include/solution_vector.h
@@ -66,7 +67,17 @@ build/solution_hashmap_main.o: src/solution_hashmap_main.c
 	$(CC) $(CFLAGS) -c src/solution_hashmap_main.c -o $@
 
 
-# Vector lib
+# Library fast_strtof
+build/fast_strtof.o: src/fast_strtof.c include/fast_strtof.h
+	mkdir -p build
+	$(CC) $(CFLAGS) -c src/fast_strtof.c -o $@
+
+
+# Tests
 bin/test_vector: tests/test_vector.c include/vector_generic.h
-	# no link flags
+	mkdir -p bin
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(TESTLDLIBS) $(TESTLINKFLAGS)
+
+bin/test_fast_strtof: tests/test_fast_strtof.c build/fast_strtof.o
+	mkdir -p bin
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(TESTLDLIBS) $(TESTLINKFLAGS)
