@@ -67,12 +67,9 @@
     int type##_vec##_from_array(type##_vec *v, const void *array,              \
                                 size_t len) {                                  \
         v->data = malloc(sizeof(type) * len);                                  \
-        if (v->data == NULL) {                                                 \
-            return 1;                                                          \
-        }                                                                      \
         memcpy(v->data, array, sizeof(type) * len);                            \
         v->len = len;                                                          \
         v->capacity = len;                                                     \
                                                                                \
-        return 0;                                                              \
+        return v->data == NULL;                                                \
     }
