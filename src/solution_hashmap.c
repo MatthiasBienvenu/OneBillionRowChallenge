@@ -11,6 +11,8 @@
 #include "solution_hashmap.h"
 #include "vector_generic.h"
 
+const float max_load_factor = 0.75;
+
 IMPLEMENT_VEC(city);
 
 int hashmap_init(hashmap *map) {

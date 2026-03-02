@@ -6,8 +6,6 @@
 
 #define MAX_LINE_LENGTH 32
 
-const float max_load_factor = 0.75;
-
 typedef struct {
     char name[MAX_LINE_LENGTH];
     size_t hash;

@@ -7,12 +7,12 @@ LDLIBS = -lm
 TESTLINKFLAGS =
 TESTLDLIBS = -lcmocka
 
-.PHONY: all clean run test perf
+.PHONY: all clean run test
 
 all: bin/solution_naive_main bin/solution_vector_main bin/solution_hashmap_main
 
 clean:
-	rm -rf build bin
+	rm -rf build bin perf.data perf.data.old out.perf out.folded flamegraph.svg
 
 run: all
 	bin/solution_hashmap_main data/measurements_100M.csv /dev/null
@@ -21,9 +21,15 @@ test: bin/test_vector bin/test_fast_strtof
 	bin/test_vector
 	bin/test_fast_strtof
 
-perf: bin/solution_hashmap_main
-	perf record --debuginfod --call-graph dwarf make run
-	perf report
+perf.data: bin/solution_hashmap_main
+	perf record -F 1000 -g --debuginfod --call-graph dwarf bin/solution_hashmap_main data/measurements_100M.csv /dev/null
+
+
+flamegraph.svg: perf.data
+	perf script > out.perf
+	stackcollapse-perf.pl out.perf > out.folded
+	flamegraph.pl out.folded > flamegraph.svg
+
 
 # Naive approach
 bin/solution_naive_main: build/solution_naive.o build/solution_naive_main.o
