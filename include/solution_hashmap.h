@@ -4,10 +4,12 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define CITY_NAME_MAX_LEN 32
+#define MAX_LINE_LENGTH 32
+
+const float max_load_factor = 0.75;
 
 typedef struct {
-    char name[CITY_NAME_MAX_LEN];
+    char name[MAX_LINE_LENGTH];
     size_t hash;
     float min_temp;
     float max_temp;
@@ -26,8 +28,10 @@ typedef struct {
     size_t count;      // number of elements stored in the hashmap
 } hashmap;
 
-/* Hash function of city names. */
-size_t hash(const char key[CITY_NAME_MAX_LEN]);
+/* Hash the key until finding a ';'.
+ * Then, set *sepptr to be a reference of that separator.
+ */
+size_t hash_fn(const char key[MAX_LINE_LENGTH], char **sepptr);
 
 /* Initialize the hashmap. */
 int hashmap_init(hashmap *map);
@@ -39,7 +43,7 @@ int hashmap_double_size(hashmap *map);
  * If the city is unknown, it is created.
  * This function returns the struct city that was created/updated.
  */
-int hashmap_update(hashmap *map, const char key[CITY_NAME_MAX_LEN],
+int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH], size_t hash,
                    float temperature);
 
 /* Process the file and store the result in map. */

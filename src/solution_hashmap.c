@@ -11,10 +11,6 @@
 #include "solution_hashmap.h"
 #include "vector_generic.h"
 
-#define MAX_LINE_LENGTH 32
-
-const float max_load_factor = 0.75;
-
 IMPLEMENT_VEC(city);
 
 int hashmap_init(hashmap *map) {
@@ -30,15 +26,15 @@ int hashmap_init(hashmap *map) {
     return map->buckets == NULL;
 }
 
-int hashmap_update(hashmap *map, const char key[CITY_NAME_MAX_LEN],
+int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH], size_t hash,
                    float temperature) {
-    size_t h = hash(key);
-    city_vec *bucket = &map->buckets[h % map->len];
+
+    city_vec *bucket = &map->buckets[hash % map->len];
 
     for (size_t i = 0; i < bucket->len; i++) {
         city *city = &bucket->data[i];
 
-        if (city->hash == h && strcmp(city->name, key) == 0) {
+        if (city->hash == hash && strcmp(city->name, key) == 0) {
             // update the city
             city->min_temp = fminf(city->min_temp, temperature);
             city->max_temp = fmaxf(city->max_temp, temperature);
@@ -51,7 +47,7 @@ int hashmap_update(hashmap *map, const char key[CITY_NAME_MAX_LEN],
     }
 
     //  add a new city
-    city city = {.hash = h,
+    city city = {.hash = hash,
                  .min_temp = temperature,
                  .max_temp = temperature,
                  .total_temp = temperature,
@@ -64,7 +60,7 @@ int hashmap_update(hashmap *map, const char key[CITY_NAME_MAX_LEN],
         if (hashmap_double_size(map)) {
             return 1;
         }
-        bucket = &map->buckets[h % map->len];
+        bucket = &map->buckets[hash % map->len];
     }
 
     return city_vec_push(bucket, &city);
@@ -109,25 +105,27 @@ size_t process_stream(hashmap *map, FILE *input_stream) {
     char buffer[MAX_LINE_LENGTH];
     char *endptr;
     float temperature;
+    size_t hash;
 
     while (fgets(buffer, MAX_LINE_LENGTH, input_stream)) {
         measurements++;
 
-        endptr = strchr(buffer, ';');
-        if (endptr == NULL) {
+        hash = hash_fn(buffer, &endptr);
+        if (*endptr == '\0') {
             return 0;
         }
 
         // end the string at the separator so that it can be directly passed
-        // to oneb_challenge_update_city
         *endptr = '\0';
-        temperature = fast_strtof(endptr + 1, &endptr);
-        if (*(endptr - 1) == '\0') {
+        endptr++;
+        temperature = fast_strtof(endptr, &endptr);
+
+        if (*endptr != '\n') {
             // no valid float could be parsed
             return 0;
         }
 
-        hashmap_update(map, buffer, temperature);
+        hashmap_update(map, buffer, hash, temperature);
     }
 
     return measurements;
@@ -165,11 +163,15 @@ void print_cities(hashmap *map, FILE *output_stream) {
 }
 
 /* fnv1a_64 */
-size_t hash(const char key[MAX_LINE_LENGTH]) {
+size_t hash_fn(const char key[MAX_LINE_LENGTH], char **sepptr) {
     size_t h = 1469598103934665603; // FNV offset basis
-    for (const char *c = key; *c != '\0'; c++) {
+    const char *c;
+
+    for (c = key; *c && *c != ';'; c++) {
         h ^= (unsigned char)*c;
         h *= 1099511628211; // FNV prime
     }
+
+    *sepptr = (char *)c;
     return h;
 }

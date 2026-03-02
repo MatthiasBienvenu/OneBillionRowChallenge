@@ -15,7 +15,7 @@ clean:
 	rm -rf build bin
 
 run: all
-	bin/solution_hashmap_main data/measurements_10m.csv /dev/null
+	bin/solution_hashmap_main data/measurements_100M.csv /dev/null
 
 test: bin/test_vector bin/test_fast_strtof
 	bin/test_vector
