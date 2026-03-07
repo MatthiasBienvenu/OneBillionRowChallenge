@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define MAX_LINE_LENGTH (size_t)32
-#define IO_BUFFER_SIZE (size_t)(1024 * 1024)
+#define IO_BUFFER_SIZE (size_t)4096
 
 typedef struct {
     char name[MAX_LINE_LENGTH];
@@ -42,8 +42,8 @@ int hashmap_double_size(hashmap *map);
  * If the city is unknown, it is created.
  * This function returns the struct city that was created/updated.
  */
-int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH], size_t hash,
-                   float temperature);
+int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
+                   size_t key_len, size_t hash, float temperature);
 
 /* Process the file and store the result in map. */
 size_t process_file(hashmap *map, int fd);

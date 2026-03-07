@@ -30,15 +30,15 @@ int hashmap_init(hashmap *map) {
     return map->buckets == NULL;
 }
 
-int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH], size_t hash,
-                   float temperature) {
+int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
+                   size_t key_len, size_t hash, float temperature) {
 
     city_vec *bucket = &map->buckets[hash % map->len];
 
     for (size_t i = 0; i < bucket->len; i++) {
         city *city = &bucket->data[i];
 
-        if (city->hash == hash && strcmp(city->name, key) == 0) {
+        if (city->hash == hash && memcmp(city->name, key, key_len) == 0) {
             // update the city
             city->min_temp = fminf(city->min_temp, temperature);
             city->max_temp = fmaxf(city->max_temp, temperature);
@@ -57,7 +57,7 @@ int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH], size_t hash,
                  .total_temp = temperature,
                  .mean_temp = temperature,
                  .count = 1};
-    strcpy(city.name, key);
+    strncpy(city.name, key, MAX_LINE_LENGTH);
 
     // maybe increase the hashmap
     if (++map->count > map->len * max_load_factor) {
@@ -112,7 +112,7 @@ size_t process_file(hashmap *map, int fd) {
     ssize_t bytes_read;
 
     char *cur_ptr = buffer;
-    char *city_name;
+    char *key_start;
 
     while ((bytes_read =
                 read(fd, buffer + left_over, IO_BUFFER_SIZE - left_over)) > 0) {
@@ -126,12 +126,14 @@ size_t process_file(hashmap *map, int fd) {
 
         // parse and treat the lines
         for (cur_ptr = buffer; cur_ptr < parse_end; measurements++) {
-            city_name = cur_ptr;
+            key_start = cur_ptr;
 
             size_t hash = hash_fn(cur_ptr, &cur_ptr);
 
+            size_t key_len = cur_ptr - key_start + 1;
+
             // end the string at the separator
-            *cur_ptr = '\0';
+            //*cur_ptr = '\0';
             cur_ptr++;
             float temperature = fast_strtof(cur_ptr, &cur_ptr);
 
@@ -143,7 +145,7 @@ size_t process_file(hashmap *map, int fd) {
             }
             cur_ptr++;
 
-            hashmap_update(map, city_name, hash, temperature);
+            hashmap_update(map, key_start, key_len, hash, temperature);
         }
 
         // copy the left over to the beginning of the buffer
