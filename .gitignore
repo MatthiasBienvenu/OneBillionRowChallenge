@@ -66,8 +66,8 @@ compile_commands.json
 # generated data
 data/
 
-# clangd stuff
-.cache
+# hidden files like LS and IDE stuff
+.*
 
 # perf stuff
 perf.data

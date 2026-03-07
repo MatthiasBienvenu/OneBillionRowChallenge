@@ -4,7 +4,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define MAX_LINE_LENGTH 32
+#define MAX_LINE_LENGTH (size_t)32
+#define IO_BUFFER_SIZE (size_t)(1024 * 1024)
 
 typedef struct {
     char name[MAX_LINE_LENGTH];
@@ -45,7 +46,7 @@ int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH], size_t hash,
                    float temperature);
 
 /* Process the file and store the result in map. */
-size_t process_stream(hashmap *map, FILE *input_stream);
+size_t process_file(hashmap *map, int fd);
 
 /* Print a city in json format. */
 void print_city(FILE *output_stream, const city *city);

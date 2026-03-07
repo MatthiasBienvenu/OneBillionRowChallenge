@@ -6,30 +6,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 // #include <string.h>
+#include <fcntl.h>
 #include <time.h>
 
 #include "solution_hashmap.h"
 
 int main(int argc, char **argv) {
-    FILE *input_stream;
+    int input_fd;
     FILE *output_stream;
 
-    if (argc == 1) {
-        fprintf(stderr, "Warning: No input_file provided, default to stdin\n");
-        input_stream = stdin;
-        output_stream = stdout;
-    } else if (argc == 2) {
-        input_stream = fopen(argv[1], "r");
+    if (argc == 2) {
+        input_fd = open(argv[1], O_RDONLY);
         output_stream = stdout;
     } else if (argc == 3) {
-        input_stream = fopen(argv[1], "r");
+        input_fd = open(argv[1], O_RDONLY);
         output_stream = fopen(argv[2], "w");
     } else {
         fputs("Usage:\none_billion_row [input_file] [output_file]\n", stderr);
         return EXIT_FAILURE;
     }
 
-    if (input_stream == NULL) {
+    if (input_fd == -1) {
         fputs("Could not open input_file as read", stderr);
         return EXIT_FAILURE;
     }
@@ -44,7 +41,7 @@ int main(int argc, char **argv) {
     hashmap oneb_data;
     hashmap_init(&oneb_data);
 
-    size_t nb_measurements = process_stream(&oneb_data, input_stream);
+    size_t nb_measurements = process_file(&oneb_data, input_fd);
 
     print_cities(&oneb_data, output_stream);
 

@@ -23,7 +23,7 @@ test: bin/test_vector bin/test_fast_strtof
 
 perf.data: bin/solution_hashmap_main
 	perf record -F 1000 -g --debuginfod --call-graph dwarf bin/solution_hashmap_main data/measurements_100M.csv /dev/null
-
+	# use `perf report` to show perf results
 
 flamegraph.svg: perf.data
 	perf script > out.perf

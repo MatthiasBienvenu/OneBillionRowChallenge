@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <cmocka.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -6,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "fast_strtof.h"
 #include "solution_hashmap.h"
@@ -102,32 +104,51 @@ int hashmap_double_size(hashmap *map) {
     return 0;
 }
 
-size_t process_stream(hashmap *map, FILE *input_stream) {
-    size_t measurements = 0;
-    char buffer[MAX_LINE_LENGTH];
-    char *endptr;
-    float temperature;
-    size_t hash;
+size_t process_file(hashmap *map, int fd) {
+    uint64_t measurements = 0;
 
-    while (fgets(buffer, MAX_LINE_LENGTH, input_stream)) {
-        measurements++;
+    char buffer[IO_BUFFER_SIZE];
+    size_t left_over = 0;
+    ssize_t bytes_read;
 
-        hash = hash_fn(buffer, &endptr);
-        if (*endptr == '\0') {
-            return 0;
+    char *cur_ptr = buffer;
+    char *city_name;
+
+    while ((bytes_read =
+                read(fd, buffer + left_over, IO_BUFFER_SIZE - left_over)) > 0) {
+        size_t total = left_over + bytes_read;
+        char *parse_end = buffer + total;
+
+        // if not the last block, we take a margin
+        if (total == IO_BUFFER_SIZE) {
+            parse_end -= MAX_LINE_LENGTH;
         }
 
-        // end the string at the separator so that it can be directly passed
-        *endptr = '\0';
-        endptr++;
-        temperature = fast_strtof(endptr, &endptr);
+        // parse and treat the lines
+        for (cur_ptr = buffer; cur_ptr < parse_end; measurements++) {
+            city_name = cur_ptr;
 
-        if (*endptr != '\n') {
-            // no valid float could be parsed
-            return 0;
+            size_t hash = hash_fn(cur_ptr, &cur_ptr);
+
+            // end the string at the separator
+            *cur_ptr = '\0';
+            cur_ptr++;
+            float temperature = fast_strtof(cur_ptr, &cur_ptr);
+
+            if (*cur_ptr != '\n') {
+                // no valid float could be parsed
+                printf("ok cool no \\n at %ld", measurements);
+
+                return 0;
+            }
+            cur_ptr++;
+
+            hashmap_update(map, city_name, hash, temperature);
         }
 
-        hashmap_update(map, buffer, hash, temperature);
+        // copy the left over to the beginning of the buffer
+        left_over = buffer + total - cur_ptr;
+        memcpy(buffer, cur_ptr, left_over);
     }
 
     return measurements;
@@ -169,7 +190,7 @@ size_t hash_fn(const char key[MAX_LINE_LENGTH], char **sepptr) {
     size_t h = 1469598103934665603; // FNV offset basis
     const char *c;
 
-    for (c = key; *c && *c != ';'; c++) {
+    for (c = key; *c != ';'; c++) {
         h ^= (unsigned char)*c;
         h *= 1099511628211; // FNV prime
     }
