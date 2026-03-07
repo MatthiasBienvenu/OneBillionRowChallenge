@@ -33,7 +33,9 @@ int hashmap_init(hashmap *map) {
 int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
                    size_t key_len, size_t hash, float temperature) {
 
-    city_vec *bucket = &map->buckets[hash % map->len];
+    // (hash & (map->len - 1)) is the same as (hash % map->len)
+    // because len is a power of 2
+    city_vec *bucket = &map->buckets[hash & (map->len - 1)];
 
     for (size_t i = 0; i < bucket->len; i++) {
         city *city = &bucket->data[i];
@@ -44,7 +46,7 @@ int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
             city->max_temp = fmaxf(city->max_temp, temperature);
             city->total_temp += temperature;
             city->count++;
-            city->mean_temp = city->total_temp / city->count;
+            // mean will be computed in print_city
 
             return 0;
         }
@@ -55,7 +57,6 @@ int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
                  .min_temp = temperature,
                  .max_temp = temperature,
                  .total_temp = temperature,
-                 .mean_temp = temperature,
                  .count = 1};
     strncpy(city.name, key, MAX_LINE_LENGTH);
 
@@ -133,7 +134,6 @@ size_t process_file(hashmap *map, int fd) {
             size_t key_len = cur_ptr - key_start + 1;
 
             // end the string at the separator
-            //*cur_ptr = '\0';
             cur_ptr++;
             float temperature = fast_strtof(cur_ptr, &cur_ptr);
 
@@ -160,8 +160,8 @@ void print_city(FILE *output_stream, const city *city) {
     fprintf(output_stream,
             "{\"city\":\"%s\",\"min\":%.1f,\"max\":%.1f,\"mean\":%.1f,"
             "\"total\":%.1f,\"count\":%d}",
-            city->name, city->min_temp, city->max_temp, city->mean_temp,
-            city->total_temp, city->count);
+            city->name, city->min_temp, city->max_temp,
+            city->total_temp / city->count, city->total_temp, city->count);
 }
 
 void print_cities(hashmap *map, FILE *output_stream) {

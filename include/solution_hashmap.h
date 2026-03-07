@@ -13,7 +13,6 @@ typedef struct {
     float min_temp;
     float max_temp;
     float total_temp;
-    float mean_temp;
     int count;
 } city;
 

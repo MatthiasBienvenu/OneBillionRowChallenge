@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude -O3 -g -fno-omit-frame-pointer
+CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude -Ofast -march=native -g -fno-omit-frame-pointer
 
 LINKFLAGS = -flto -static
 LDLIBS = -lm
