@@ -27,7 +27,7 @@ int hashmap_init(hashmap *map) {
 
     city_vec_init(map->buckets);
 
-    return map->buckets == NULL;
+    return 0;
 }
 
 int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
@@ -40,7 +40,8 @@ int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
     for (size_t i = 0; i < bucket->len; i++) {
         city *city = &bucket->data[i];
 
-        if (city->hash == hash && memcmp(city->name, key, key_len) == 0) {
+        if (city->name_len == key_len && city->hash == hash &&
+            memcmp(city->name, key, key_len) == 0) {
             // update the city
             city->min_temp = fminf(city->min_temp, temperature);
             city->max_temp = fmaxf(city->max_temp, temperature);

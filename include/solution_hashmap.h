@@ -4,11 +4,12 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define MAX_LINE_LENGTH (size_t)32
-#define IO_BUFFER_SIZE (size_t)4096
+#define MAX_LINE_LENGTH ((size_t)32)
+#define IO_BUFFER_SIZE ((size_t)4096)
 
 typedef struct {
     char name[MAX_LINE_LENGTH];
+    size_t name_len;
     size_t hash;
     float min_temp;
     float max_temp;
