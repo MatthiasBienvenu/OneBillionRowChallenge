@@ -58,14 +58,14 @@ int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
                  .max_temp = temperature,
                  .total_temp = temperature,
                  .count = 1};
-    strncpy(city.name, key, MAX_LINE_LENGTH);
+    memcpy(city.name, key, key_len);
 
     // maybe increase the hashmap
     if (++map->count > map->len * max_load_factor) {
         if (hashmap_double_size(map)) {
             return 1;
         }
-        bucket = &map->buckets[hash % map->len];
+        bucket = &map->buckets[hash & (map->len - 1)];
     }
 
     return city_vec_push(bucket, &city);
