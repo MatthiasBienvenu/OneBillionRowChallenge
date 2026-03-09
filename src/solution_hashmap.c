@@ -13,7 +13,7 @@
 #include "solution_hashmap.h"
 #include "vector_generic.h"
 
-const float max_load_factor = 0.75;
+const float max_load_factor = 0.5;
 
 IMPLEMENT_VEC(city);
 
@@ -40,7 +40,7 @@ int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
     for (size_t i = 0; i < bucket->len; i++) {
         city *city = &bucket->data[i];
 
-        if (city->name_len == key_len && city->hash == hash &&
+        if (city->hash == hash && city->name_len == key_len &&
             memcmp(city->name, key, key_len) == 0) {
             // update the city
             city->min_temp = fminf(city->min_temp, temperature);
@@ -55,11 +55,12 @@ int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
 
     //  add a new city
     city city = {.hash = hash,
+                 .name_len = key_len,
                  .min_temp = temperature,
                  .max_temp = temperature,
                  .total_temp = temperature,
                  .count = 1};
-    memcpy(city.name, key, key_len);
+    strncpy(city.name, key, MAX_LINE_LENGTH);
 
     // maybe increase the hashmap
     if (++map->count > map->len * max_load_factor) {
@@ -92,12 +93,14 @@ int hashmap_double_size(hashmap *map) {
 
         for (size_t j = 0; j < old_bucket->len; j++) {
             const city *city = &old_bucket->data[j];
-            city_vec *new_bucket = &map->buckets[city->hash % new_len];
+            city_vec *new_bucket = &map->buckets[city->hash & (new_len - 1)];
 
             if (city_vec_push(new_bucket, city)) {
                 return 1;
             };
         }
+
+        free(old_bucket->data);
     }
 
     map->len = new_len;
@@ -132,7 +135,7 @@ size_t process_file(hashmap *map, int fd) {
 
             size_t hash = hash_fn(cur_ptr, &cur_ptr);
 
-            size_t key_len = cur_ptr - key_start + 1;
+            size_t key_len = cur_ptr - key_start;
 
             // end the string at the separator
             cur_ptr++;
@@ -159,9 +162,9 @@ size_t process_file(hashmap *map, int fd) {
 
 void print_city(FILE *output_stream, const city *city) {
     fprintf(output_stream,
-            "{\"city\":\"%s\",\"min\":%.1f,\"max\":%.1f,\"mean\":%.1f,"
+            "{\"city\":\"%.*s\",\"min\":%.1f,\"max\":%.1f,\"mean\":%.1f,"
             "\"total\":%.1f,\"count\":%d}",
-            city->name, city->min_temp, city->max_temp,
+            (int)city->name_len, city->name, city->min_temp, city->max_temp,
             city->total_temp / city->count, city->total_temp, city->count);
 }
 
