@@ -9,20 +9,20 @@ TESTLDLIBS = -lcmocka
 
 .PHONY: all clean run test
 
-all: bin/solution_naive_main bin/solution_vector_main bin/solution_hashmap_main
+all: bin/solution_naive_main bin/solution_vector_main bin/solution_hashmap_main bin/solution_hashmap_open_addressing_main
 
 clean:
 	rm -rf build bin perf.data perf.data.old out.perf out.folded flamegraph.svg
 
 run: all
-	bin/solution_hashmap_main data/measurements_100M.csv /dev/null
+	bin/solution_hashmap_open_addressing_main data/measurements_100M.csv /dev/null
 
 test: bin/test_vector bin/test_fast_strtof
 	bin/test_vector
 	bin/test_fast_strtof
 
 perf.data: bin/solution_hashmap_main
-	perf record -F 1000 -g --debuginfod --call-graph dwarf bin/solution_hashmap_main data/measurements_100M.csv /dev/null
+	perf record -F 1000 -g --debuginfod --call-graph dwarf bin/solution_hashmap_open_addressing_main data/measurements_100M.csv /dev/null
 	# use `perf report` to show perf results
 
 flamegraph.svg: perf.data
@@ -59,7 +59,7 @@ build/solution_vector_main.o: src/solution_vector_main.c
 	$(CC) $(CFLAGS) -c src/solution_vector_main.c -o $@
 
 
-# Approach with a hashmap
+# Approach with a hashmap with vectors
 bin/solution_hashmap_main: build/solution_hashmap.o build/solution_hashmap_main.o build/fast_strtof.o
 	mkdir -p bin
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(LINKFLAGS)
@@ -71,6 +71,20 @@ build/solution_hashmap.o: src/solution_hashmap.c include/solution_hashmap.h incl
 build/solution_hashmap_main.o: src/solution_hashmap_main.c
 	mkdir -p build
 	$(CC) $(CFLAGS) -c src/solution_hashmap_main.c -o $@
+
+
+# Approach with a hashmap with open addressing
+bin/solution_hashmap_open_addressing_main: build/solution_hashmap_open_addressing.o build/solution_hashmap_open_addressing_main.o build/fast_strtof.o
+	mkdir -p bin
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) $(LINKFLAGS)
+
+build/solution_hashmap_open_addressing.o: src/solution_hashmap_open_addressing.c include/solution_hashmap_open_addressing.h
+	mkdir -p build
+	$(CC) $(CFLAGS) -c src/solution_hashmap_open_addressing.c -o $@
+
+build/solution_hashmap_open_addressing_main.o: src/solution_hashmap_open_addressing_main.c
+	mkdir -p build
+	$(CC) $(CFLAGS) -c src/solution_hashmap_open_addressing_main.c -o $@
 
 
 # Library fast_strtof

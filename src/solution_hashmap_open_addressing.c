@@ -1,31 +1,23 @@
-#include <assert.h>
-#include <cmocka.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <unistd.h>
 
 #include "fast_strtof.h"
-#include "solution_hashmap.h"
-#include "vector_generic.h"
+#include "solution_hashmap_open_addressing.h"
 
 const float max_load_factor = 0.5;
 
-IMPLEMENT_VEC(city);
-
 int hashmap_init(hashmap *map) {
-    map->buckets = malloc(sizeof(city_vec));
-    if (map->buckets == NULL) {
+    map->cities = calloc(1, sizeof(city));
+    if (map->cities == NULL) {
         return 1;
     }
     map->len = 1;
     map->count = 0;
-
-    city_vec_init(map->buckets);
 
     return 0;
 }
@@ -33,79 +25,78 @@ int hashmap_init(hashmap *map) {
 int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
                    size_t key_len, size_t hash, float temperature) {
 
-    // (hash & (map->len - 1)) is the same as (hash % map->len)
-    // because len is a power of 2
-    city_vec *bucket = &map->buckets[hash & (map->len - 1)];
+    size_t offset = 0;
+    city *city = &map->cities[(hash + offset) & (map->len - 1)];
 
-    for (size_t i = 0; i < bucket->len; i++) {
-        city *city = &bucket->data[i];
-
-        if (city->hash == hash && city->name_len == key_len &&
+    while (city->name_len != 0) {
+        if (city->name_len == key_len && city->hash == hash &&
             memcmp(city->name, key, key_len) == 0) {
-            // update the city
+
             city->min_temp = fminf(city->min_temp, temperature);
             city->max_temp = fmaxf(city->max_temp, temperature);
             city->total_temp += temperature;
             city->count++;
-            // mean will be computed in print_city
 
             return 0;
         }
+
+        offset++;
+        city = &map->cities[(hash + offset) & (map->len - 1)];
     }
 
-    //  add a new city
-    city city = {.hash = hash,
-                 .name_len = key_len,
-                 .min_temp = temperature,
-                 .max_temp = temperature,
-                 .total_temp = temperature,
-                 .count = 1};
-    strncpy(city.name, key, MAX_LINE_LENGTH);
+    // an empty space was found
+    // so we need to create a new city
 
-    // maybe increase the hashmap
+    // maybe increase the size of the hashmap
     if (++map->count > map->len * max_load_factor) {
         if (hashmap_double_size(map)) {
             return 1;
         }
-        bucket = &map->buckets[hash & (map->len - 1)];
+        // the offset is no longer valid
+        return hashmap_update(map, key, key_len, hash, temperature);
     }
 
-    return city_vec_push(bucket, &city);
+    city->name_len = key_len;
+    city->hash = hash;
+    city->min_temp = temperature;
+    city->max_temp = temperature;
+    city->total_temp = temperature;
+    city->count = 1;
+    strncpy(city->name, key, MAX_LINE_LENGTH);
+
+    return 0;
 }
 
 int hashmap_double_size(hashmap *map) {
-    city_vec *old_buckets = map->buckets;
+    city *old_cities = map->cities;
     const size_t new_len = map->len * 2;
 
-    map->buckets = malloc(new_len * sizeof(city_vec));
-    if (map->buckets == NULL) {
+    map->cities = calloc(new_len, sizeof(city));
+    if (map->cities == NULL) {
         return 1;
     }
 
-    for (size_t i = 0; i < new_len; i++) {
-        if (city_vec_init(&map->buckets[i])) {
-            return 1;
-        }
-    }
-
     for (size_t i = 0; i < map->len; i++) {
-        const city_vec *old_bucket = &old_buckets[i];
+        const city *old_city = &old_cities[i];
 
-        for (size_t j = 0; j < old_bucket->len; j++) {
-            const city *city = &old_bucket->data[j];
-            city_vec *new_bucket = &map->buckets[city->hash & (new_len - 1)];
-
-            if (city_vec_push(new_bucket, city)) {
-                return 1;
-            };
+        if (old_city->name_len == 0) {
+            continue;
         }
 
-        free(old_bucket->data);
+        size_t offset = 0;
+        city *new_city =
+            &map->cities[(old_city->hash + offset) & (new_len - 1)];
+
+        while (new_city->name_len != 0) {
+            offset++;
+            new_city = &map->cities[(old_city->hash + offset) & (new_len - 1)];
+        }
+
+        memcpy(new_city, old_city, sizeof(city));
     }
 
     map->len = new_len;
-
-    free(old_buckets);
+    free(old_cities);
     return 0;
 }
 
@@ -173,19 +164,19 @@ void print_cities(hashmap *map, FILE *output_stream) {
 
     int first = 1; // Track if this is the first city
 
-    for (size_t b = 0; b < map->len; b++) {
-        city_vec *bucket = &map->buckets[b];
+    for (size_t i = 0; i < map->len; i++) {
+        city *city = &map->cities[i];
 
-        for (size_t i = 0; i < bucket->len; i++) {
-            city *city = &bucket->data[i];
-
-            if (!first) {
-                fputs(",", output_stream);
-            }
-            first = 0;
-
-            print_city(output_stream, city);
+        if (city->name_len == 0) {
+            continue;
         }
+
+        if (!first) {
+            fputs(",", output_stream);
+        }
+        first = 0;
+
+        print_city(output_stream, city);
     }
 
     fputs("]", output_stream);

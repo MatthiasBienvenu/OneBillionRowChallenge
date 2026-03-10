@@ -1,7 +1,6 @@
 #pragma once
 
-#include "vector_generic.h"
-#include <stddef.h>
+// #include <stddef.h>
 #include <stdio.h>
 
 #define MAX_LINE_LENGTH ((size_t)32)
@@ -17,14 +16,10 @@ typedef struct {
     float total_temp;
 } city;
 
-// city_vec
-// need to call IMPLEMENT_VEC(city) in a .c file later
-DECLARE_VEC(city);
-
 typedef struct {
-    city_vec *buckets; // vectors that store elements with keys of same hash
-    size_t len;        // length of the buckets array
-    size_t count;      // number of elements stored in the hashmap
+    city *cities; // array of elements
+    size_t len;   // length of the cities array
+    size_t count; // number of elements stored in the hashmap
 } hashmap;
 
 /* Hash the key until finding a ';'.
