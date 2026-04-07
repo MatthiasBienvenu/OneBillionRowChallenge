@@ -1,8 +1,5 @@
-// I do not know why but without this, time.h is broken
-#include <stddef.h>
-#define _POSIX_C_SOURCE 199309L
-
 #include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 // #include <string.h>

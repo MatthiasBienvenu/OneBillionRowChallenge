@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude -Ofast -march=native -g -fno-omit-frame-pointer
+CFLAGS = -Wall -Wextra -Werror -std=c23 -Iinclude -Ofast -march=native -g -fno-omit-frame-pointer -pthread -D_POSIX_C_SOURCE=200809L -DTHREAD_COUNT=16
 
 LINKFLAGS = -flto -static
 LDLIBS = -lm

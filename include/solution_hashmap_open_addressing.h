@@ -35,13 +35,36 @@ int hashmap_double_size(hashmap *map);
 
 /* Search for a city and update its temperature statistics.
  * If the city is unknown, it is created.
- * This function returns the struct city that was created/updated.
  */
 int hashmap_update(hashmap *map, const char key[MAX_LINE_LENGTH],
                    size_t key_len, size_t hash, float temperature);
 
-/* Process the file and store the result in map. */
+/* Merge map2 into map1.
+ * map2 is not modified.
+ */
+int hashmap_merge(hashmap *map1, hashmap *map2);
+
+/* Search for a city and update its temperature statistics.
+ * If the city is unknown, it is created.
+ */
+int hashmap_update_with_city(hashmap *map, city *old_city);
+
+/* Process the file and store the result in map.
+ * Internally this function will launch multiple executions of
+ * process_chunk_thread and then merge the hashmaps into map
+ */
 size_t process_file(hashmap *map, int fd);
+
+typedef struct {
+    hashmap *map;
+    size_t *measurements;
+    off_t len;
+    off_t offset;
+    int fd;
+} process_chunk_thread_arg;
+
+/* Process chunk of the file and store the result in map. */
+void *process_chunk_thread(void *_arg);
 
 /* Print a city in json format. */
 void print_city(FILE *output_stream, const city *city);
