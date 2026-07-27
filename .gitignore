@@ -76,4 +76,3 @@ perf.data.old
 # flamegraph stuff
 out.perf
 out.folded
-flamegraph.svg
