@@ -10,14 +10,13 @@ This project is my solution for a small optimization challenge in C. The goal is
 
 The project is organized as follows:
 
-- **`src/`**: Source code for the 4 solutions (naive, vector, hashmap, hashmap with *open addressing* + threads).
+- **`src/`**: Source code for the 4 solutions (naive, vector, hashmap, hashmap with _open addressing_ + threads).
 - **`include/`**: Headers for solutions and data structures (e.g., [`solution_hashmap.h`](include/solution_hashmap.h), [`vector_generic.h`](include/vector_generic.h)).
 - **`data/`**: Test files.
 - **`scripts/generate_data.py`**: Generates custom CSV files.
 - **`Makefile`**: Manages compilation, tests, and profiling.
 
 ### Makefile Targets
-
 
 | Target                | Description                                                                                   |
 | --------------------- | --------------------------------------------------------------------------------------------- |
@@ -27,7 +26,6 @@ The project is organized as follows:
 | `make clean`          | Cleans binaries and temporary files (`bin/`, `build/`, `perf.data`, etc.).                    |
 | `make perf.data`      | Generates a performance data file with `perf record` (on `solution_hashmap_open_addressing`). |
 | `make flamegraph.svg` | Converts `perf.data` into a [flamegraph](flamegraph.svg) to visualize bottlenecks.            |
-
 
 ---
 
@@ -56,7 +54,6 @@ make flamegraph.svg # Generates the flamegraph (requires https://github.com/bren
 
 ![FlameGraph](flamegraph.svg)
 
-
 ---
 
 ## Optimizations Implemented
@@ -76,8 +73,8 @@ make flamegraph.svg # Generates the flamegraph (requires https://github.com/bren
 
 - **Hashing**: Uses **FNV-1a 64-bit** because it's a basic and effective hash function.
 - **Collision Handling**:
-  - *Chaining*: Dynamic vectors in each bucket with automatic resizing.
-  - *Open addressing*: Linear probing with automatic resizing.
+    - _Chaining_: Dynamic vectors in each bucket with automatic resizing.
+    - _Open addressing_: Linear probing with automatic resizing.
 
 ### 3: **Optimized File Reading**
 
@@ -97,7 +94,6 @@ This is really the most important part. Instead of using `stdio`, which buffers 
 
 ## Benchmarks
 
-
 | Solution                | Time per line (100M lines) |
 | ----------------------- | -------------------------- |
 | Naïve                   | \~700ns                    |
@@ -105,8 +101,7 @@ This is really the most important part. Instead of using `stdio`, which buffers 
 | Hashmap vectors         | \~20ns                     |
 | Hashmap open addressing | \~20ns                     |
 
-
-> *Benchmarks performed on a laptop equipped with a Ryzen AI 350.*
+> _Benchmarks performed on a laptop equipped with a Ryzen AI 350._
 
 ---
 
@@ -135,4 +130,4 @@ make clean && make perf.data && make flamegraph.svg
 
 ## License
 
-MIT – Free to use, modify, and distribute.
+MIT, Free to use, modify, and distribute.
