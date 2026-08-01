@@ -223,8 +223,9 @@ void *process_chunk_thread(void *_arg) {
             // no \n found ?
             return NULL;
         }
-
-        offset += nl - buffer + 1;
+        off_t skip = nl - buffer + 1;
+        offset += skip;
+        total_treated += skip;
     }
 
     char *key_start;
@@ -245,7 +246,7 @@ void *process_chunk_thread(void *_arg) {
 
         // parse and treat the lines
         while (cur_ptr < parse_end) {
-            if (total_treated >= arg->len) {
+            if (total_treated > arg->len) {
                 // thread job over
                 return NULL;
             }
