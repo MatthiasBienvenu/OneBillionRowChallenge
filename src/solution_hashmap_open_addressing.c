@@ -201,6 +201,7 @@ size_t process_file(hashmap *map, int fd) {
 void *process_chunk_thread(void *_arg) {
     process_chunk_thread_arg *arg = _arg;
 
+    size_t measurements = 0;
     *arg->measurements = 0;
 
     char buffer[IO_BUFFER_SIZE];
@@ -248,6 +249,8 @@ void *process_chunk_thread(void *_arg) {
         while (cur_ptr < parse_end) {
             if (total_treated > arg->len) {
                 // thread job over
+
+                *(arg->measurements) = measurements;
                 return NULL;
             }
 
@@ -263,9 +266,9 @@ void *process_chunk_thread(void *_arg) {
 
             if (*cur_ptr != '\n') {
                 // no valid float could be parsed
-                printf("ok cool no \\n at %ld", *(arg->measurements));
+                printf("ok cool no \\n at %zu", measurements);
 
-                arg->measurements = 0;
+                *(arg->measurements) = 0;
                 return NULL;
             }
             cur_ptr++;
@@ -274,7 +277,7 @@ void *process_chunk_thread(void *_arg) {
 
             hashmap_update(arg->map, key_start, key_len, hash, temperature);
 
-            (*(arg->measurements))++;
+            measurements++;
         }
 
         // copy the left over to the beginning of the buffer
@@ -282,6 +285,7 @@ void *process_chunk_thread(void *_arg) {
         memcpy(buffer, cur_ptr, left_over);
     }
 
+    *(arg->measurements) = measurements;
     return NULL;
 }
 
